@@ -26,6 +26,13 @@ var OBJECT_PLAYER = 1,
     OBJECT_ENEMY_PROJECTILE = 8,
     OBJECT_POWERUP = 16;
 
+var posiciones = {
+  arriba: {x: 325, y: 90},
+  medioArriba: {x: 357, y: 185},
+  medioAbajo: {x: 389, y: 281},
+  abajo: {x: 421, y: 377}
+};
+
 var startGame = function() {
   var ua = navigator.userAgent.toLowerCase();
   /*
@@ -64,6 +71,7 @@ var playGame = function() {
   var board = new GameBoard();
   board.add(new Player());
   Game.setBoard(1, board);
+  Game.setBoard(4, new SemiBackground());
   Game.setBoard(0, new Background());
   Game.setBoard(5,new GamePoints(0));
 };
@@ -145,21 +153,41 @@ var Player = function() {
   this.setup('Player', { vx: 0, reloadTime: 0.25, maxVel: 200 });
 
   this.reload = this.reloadTime;
-  this.x = Game.width/2 - this.w / 2;
-  this.y = Game.height - Game.playerOffset - this.h;
+  this.x = posiciones.abajo.x;
+  this.y = posiciones.abajo.y;
+  this.cadencia = this.reloadTime;
 
   this.step = function(dt) {
-    if(Game.keys['left']) { this.vx = -this.maxVel; }
-    else if(Game.keys['right']) { this.vx = this.maxVel; }
-    else { this.vx = 0; }
-
-    this.x += this.vx * dt;
-
-    if(this.x < 0) { this.x = 0; }
-    else if(this.x > Game.width - this.w) {
-      this.x = Game.width - this.w;
+    var posicionSiguiente = {x: this.x, y: this.y};
+    this.cadencia -= dt;
+    if(Game.keys['up'] && this.cadencia < 0){
+      Game.keys['up'] = false;
+      if(this.x === posiciones.arriba.x){
+        posicionSiguiente = posiciones.abajo;
+      }else if(this.x === posiciones.medioArriba.x){
+        posicionSiguiente = posiciones.arriba;
+      }else if(this.x === posiciones.medioAbajo.x){
+        posicionSiguiente = posiciones.medioArriba;
+      }else if(this.x === posiciones.abajo.x){
+        posicionSiguiente = posiciones.medioAbajo;
+      }
+      this.cadencia = this.reloadTime;
+    }else if(Game.keys['down'] && this.cadencia < 0){
+      Game.keys['down'] = false;
+      if(this.x === posiciones.arriba.x){
+        posicionSiguiente = posiciones.medioArriba;
+      }else if(this.x === posiciones.medioArriba.x){
+        posicionSiguiente = posiciones.medioAbajo;
+      }else if(this.x === posiciones.medioAbajo.x){
+        posicionSiguiente = posiciones.abajo;
+      }else if(this.x === posiciones.abajo.x){
+        posicionSiguiente = posiciones.arriba;
+      }
+      this.cadencia = this.reloadTime;
     }
 
+    this.x = posicionSiguiente.x;
+    this.y = posicionSiguiente.y;
     this.reload-=dt;
     if(Game.keys['fire'] && this.reload < 0) {
       Game.keys['fire'] = false;
@@ -168,6 +196,7 @@ var Player = function() {
       this.board.add(new ThrowBeer(this.x,this.y+this.h/2));
     }
   };
+
 };
 
 Player.prototype = new Sprite();
@@ -181,7 +210,7 @@ Player.prototype.hit = function(damage) {
 
 
 var ThrowBeer = function(x,y) {
-  this.setup('Beer',{ vy: -700, damage: 10 });
+  this.setup('Beer',{ vx: -70, damage: 10 });
   this.x = x - this.w/2;
   this.y = y - this.h;
 };
@@ -189,13 +218,13 @@ var ThrowBeer = function(x,y) {
 ThrowBeer.prototype = new Sprite();
 ThrowBeer.prototype.type = OBJECT_PLAYER_PROJECTILE;
 
-ThrowBeer.prototype.step = function(dt)  {
-  this.y += this.vy * dt;
+ThrowBeer.prototype.step = function(dt){
+  this.x += this.vx * dt;
   var collision = this.board.collide(this,OBJECT_ENEMY);
   if(collision) {
     collision.hit(this.damage);
     this.board.remove(this);
-  } else if(this.y < -this.h) {
+  } else if(this.x < -this.w) {
       this.board.remove(this);
   }
 };
@@ -280,8 +309,6 @@ EnemyMissile.prototype.step = function(dt)  {
   }
 };
 
-
-
 var Explosion = function(centerX,centerY) {
   this.setup('explosion', { frame: 0 });
   this.x = centerX - this.w/2;
@@ -311,3 +338,13 @@ var Background = function(){
 };
 
 Background.prototype = new Sprite();
+
+var SemiBackground = function(){
+  this.setup('ParedIzda');
+  this.x = 0;
+  this.y = 0;
+
+  this.step = function(){};
+};
+
+SemiBackground.prototype = new Sprite();
