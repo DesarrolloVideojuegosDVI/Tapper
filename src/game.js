@@ -19,9 +19,9 @@ var enemies = {
               B: 150, C: 1.2, E: 75 }
 };
 var OBJECT_PLAYER = 1,
-    OBJECT_PLAYER_PROJECTILE = 2,
-    OBJECT_ENEMY = 4,
-    OBJECT_ENEMY_PROJECTILE = 8,
+    OBJECT_BEER = 2,
+    OBJECT_CLIENT = 4,
+    OBJECT_EMPTY_BEER = 8,
     OBJECT_POWERUP = 16;
 var posiciones = {
   arriba: {x: 325, y: 90},
@@ -130,24 +130,6 @@ var Starfield = function(speed,opacity,numStars,clear) {
     offset += dt * speed;
     offset = offset % stars.height;
   };
-};
-
-var EnemyMissile = function(x,y) {
-  this.setup('enemy_missile',{ vy: 200, damage: 10 });
-  this.x = x - this.w/2;
-  this.y = y;
-};
-EnemyMissile.prototype = new Sprite();
-EnemyMissile.prototype.type = OBJECT_ENEMY_PROJECTILE;
-EnemyMissile.prototype.step = function(dt)  {
-  this.y += this.vy * dt;
-  var collision = this.board.collide(this,OBJECT_PLAYER)
-  if(collision) {
-    collision.hit(this.damage);
-    this.board.remove(this);
-  } else if(this.y > Game.height) {
-      this.board.remove(this);
-  }
 };
 
 var Explosion = function(centerX,centerY) {
