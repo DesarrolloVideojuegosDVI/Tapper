@@ -2,8 +2,8 @@ var Player = function() {
   this.setup('Player', { vx: 0, reloadTime: 0.25, maxVel: 200 });
 
   this.reload = this.reloadTime;
-  this.x = posiciones.abajo.x;
-  this.y = posiciones.abajo.y;
+  this.x = posiciones.barra3.x;
+  this.y = posiciones.barra3.y;
   this.cadencia = this.reloadTime;
 
   this.step = function(dt) {
@@ -11,26 +11,26 @@ var Player = function() {
     this.cadencia -= dt;
     if(Game.keys['up'] && this.cadencia < 0){
       Game.keys['up'] = false;
-      if(this.x === posiciones.arriba.x){
-        posicionSiguiente = posiciones.abajo;
-      }else if(this.x === posiciones.medioArriba.x){
-        posicionSiguiente = posiciones.arriba;
-      }else if(this.x === posiciones.medioAbajo.x){
-        posicionSiguiente = posiciones.medioArriba;
-      }else if(this.x === posiciones.abajo.x){
-        posicionSiguiente = posiciones.medioAbajo;
+      if(this.x === posiciones.barra0.x){
+        posicionSiguiente = posiciones.barra3;
+      }else if(this.x === posiciones.barra1.x){
+        posicionSiguiente = posiciones.barra0;
+      }else if(this.x === posiciones.barra2.x){
+        posicionSiguiente = posiciones.barra1;
+      }else if(this.x === posiciones.barra3.x){
+        posicionSiguiente = posiciones.barra2;
       }
       this.cadencia = this.reloadTime;
     }else if(Game.keys['down'] && this.cadencia < 0){
       Game.keys['down'] = false;
-      if(this.x === posiciones.arriba.x){
-        posicionSiguiente = posiciones.medioArriba;
-      }else if(this.x === posiciones.medioArriba.x){
-        posicionSiguiente = posiciones.medioAbajo;
-      }else if(this.x === posiciones.medioAbajo.x){
-        posicionSiguiente = posiciones.abajo;
-      }else if(this.x === posiciones.abajo.x){
-        posicionSiguiente = posiciones.arriba;
+      if(this.x === posiciones.barra0.x){
+        posicionSiguiente = posiciones.barra1;
+      }else if(this.x === posiciones.barra1.x){
+        posicionSiguiente = posiciones.barra2;
+      }else if(this.x === posiciones.barra2.x){
+        posicionSiguiente = posiciones.barra3;
+      }else if(this.x === posiciones.barra3.x){
+        posicionSiguiente = posiciones.barra0;
       }
       this.cadencia = this.reloadTime;
     }

@@ -5,34 +5,39 @@ var sprites = {
   ParedIzda: {sx: 0, sy: 0, w: 512, h: 480, frames: 1},
   Player: {sx: 512, sy: 0, w: 56, h: 66, frames: 1},
   TapperGameplay: {sx: 0, sy: 480, w: 512, h: 480, frames: 1}
-}
-var enemies = {
-  straight: { x: 0,   y: -50, sprite: 'enemy_ship', health: 10,
-              E: 100 },
-  ltr:      { x: 0,   y: -100, sprite: 'enemy_purple', health: 10,
-              B: 75, C: 1, E: 100, missiles: 2  },
-  circle:   { x: 250,   y: -50, sprite: 'enemy_circle', health: 10,
-              A: 0,  B: -100, C: 1, E: 20, F: 100, G: 1, H: Math.PI/2 },
-  wiggle:   { x: 100, y: -50, sprite: 'enemy_bee', health: 20,
-              B: 50, C: 4, E: 100, firePercentage: 0.001, missiles: 2 },
-  step:     { x: 0,   y: -50, sprite: 'enemy_circle', health: 10,
-              B: 150, C: 1.2, E: 75 }
 };
+
+var deadzones = {
+  barra0: {
+    izquierda: { x: 10, y: 10 },
+    derecha: { x: 10, y: 10 }
+  },
+  barra1: {
+    izquierda: { x: 10, y: 10 },
+    derecha: { x: 10, y: 10 }
+  },
+  barra2: {
+    izquierda: { x: 10, y: 10 },
+    derecha: { x: 10, y: 10 }
+  },
+  barra3: {
+    izquierda: { x: 10, y: 10 },
+    derecha: { x: 10, y: 10 }
+  }
+};
+
 var OBJECT_PLAYER = 1,
     OBJECT_BEER = 2,
     OBJECT_CLIENT = 4,
     OBJECT_GLASS = 8,
-    OBJECT_POWERUP = 16;
+    OBJECT_DEADZONE = 16;
+
 var posiciones = {
-  arriba: {x: 325, y: 90},
-  medioArriba: {x: 357, y: 185},
-  medioAbajo: {x: 389, y: 281},
-  abajo: {x: 421, y: 377}
+  barra0: {x: 325, y: 90},
+  barra1: {x: 357, y: 185},
+  barra2: {x: 389, y: 281},
+  barra3: {x: 421, y: 377}
 };
-var level1 = [
- // Start,   End, Gap,  Type,   Override
-  [ 0,      4000,  500, 'step' ]
-];
 
 var startGame = function() {
   var ua = navigator.userAgent.toLowerCase();
@@ -46,10 +51,10 @@ var startGame = function() {
 var playGame = function() {
   var board = new GameBoard();
   board.add(new Player());
-  board.add(new Level(level1, winGame));
+  board.add(new Client(0, posiciones.barra3.y-10));
+  //creacionDeadZones(board);
   Game.setBoard(1, board);
   Game.setBoard(4, new SemiBackground());
-  Game.setBoard(0, new Background());
   Game.setBoard(5, new GamePoints(0));
 };
 
@@ -161,3 +166,9 @@ var SemiBackground = function(){
   this.step = function(){};
 };
 SemiBackground.prototype = new Sprite();
+
+function creacionDeadZone(boards){
+  for(i = 0; i < 8; ++i){
+
+  }
+}
