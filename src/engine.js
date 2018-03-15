@@ -335,7 +335,7 @@ Level.prototype.step = function(dt) {
           override = curShip[4];
 
       // Add a new enemy with the blueprint and override
-      this.board.add(new Enemy(enemy,override));
+      this.board.add(new Client(enemy,override));
 
       // Increment the start time by the gap
       curShip[0] += curShip[2];
@@ -351,7 +351,7 @@ Level.prototype.step = function(dt) {
 
   // If there are no more enemies on the board or in
   // levelData, this level is done
-  if(this.levelData.length === 0 && this.board.cnt[OBJECT_ENEMY] === 0) {
+  if(this.levelData.length === 0 && this.board.cnt[OBJECT_CLIENT] === 0) {
     if(this.callback) this.callback();
   }
 
