@@ -21,7 +21,7 @@ var enemies = {
 var OBJECT_PLAYER = 1,
     OBJECT_BEER = 2,
     OBJECT_CLIENT = 4,
-    OBJECT_EMPTY_BEER = 8,
+    OBJECT_GLASS = 8,
     OBJECT_POWERUP = 16;
 var posiciones = {
   arriba: {x: 325, y: 90},

@@ -1,7 +1,7 @@
-var Client = function(blueprint,override) {
-  this.merge(this.baseParameters);
-  this.setup(blueprint.sprite,blueprint);
-  this.merge(override);
+var Client = function(x, y) {
+  this.setup('NPC', { vx: 70, damage: 10 });
+  this.x = x - this.w/2;
+  this.y = y - this.h;
 };
 Client.prototype = new Sprite();
 Client.prototype.type = OBJECT_CLIENT;
@@ -10,36 +10,13 @@ Client.prototype.baseParameters = { A: 0, B: 0, C: 0, D: 0,
                                    t: 0, reloadTime: 0.75,
                                    reload: 0 };
 Client.prototype.step = function(dt) {
-  this.t += dt;
-
-  this.vx = this.A + this.B * Math.sin(this.C * this.t + this.D);
-  this.vy = this.E + this.F * Math.sin(this.G * this.t + this.H);
-
   this.x += this.vx * dt;
-  this.y += this.vy * dt;
-
-  var collision = this.board.collide(this,OBJECT_PLAYER);
+  var collision = this.board.collide(this,OBJECT_BEER);
   if(collision) {
-    collision.hit(this.damage);
+    this.board.add(new Glass(this.x,this.y+this.h/2));
+    this.vx = -70;
+  } else if(this.x < -this.w) {
     this.board.remove(this);
-  }
-
-  if(Math.random() < 0.01 && this.reload <= 0) {
-    this.reload = this.reloadTime;
-    if(this.missiles == 2) {
-      this.board.add(new EnemyMissile(this.x+this.w-2,this.y+this.h));
-      this.board.add(new EnemyMissile(this.x+2,this.y+this.h));
-    } else {
-      this.board.add(new EnemyMissile(this.x+this.w/2,this.y+this.h));
-    }
-
-  }
-  this.reload-=dt;
-
-  if(this.y > Game.height ||
-     this.x < -this.w ||
-     this.x > Game.width) {
-       this.board.remove(this);
   }
 };
 Client.prototype.hit = function(damage) {
