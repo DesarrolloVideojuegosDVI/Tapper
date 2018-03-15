@@ -6,7 +6,6 @@ var sprites = {
   Player: {sx: 512, sy: 0, w: 56, h: 66, frames: 1},
   TapperGameplay: {sx: 0, sy: 480, w: 512, h: 480, frames: 1}
 }
-
 var enemies = {
   straight: { x: 0,   y: -50, sprite: 'enemy_ship', health: 10,
               E: 100 },
@@ -19,40 +18,17 @@ var enemies = {
   step:     { x: 0,   y: -50, sprite: 'enemy_circle', health: 10,
               B: 150, C: 1.2, E: 75 }
 };
-
 var OBJECT_PLAYER = 1,
     OBJECT_PLAYER_PROJECTILE = 2,
     OBJECT_ENEMY = 4,
     OBJECT_ENEMY_PROJECTILE = 8,
     OBJECT_POWERUP = 16;
-
 var posiciones = {
   arriba: {x: 325, y: 90},
   medioArriba: {x: 357, y: 185},
   medioAbajo: {x: 389, y: 281},
   abajo: {x: 421, y: 377}
 };
-
-var startGame = function() {
-  var ua = navigator.userAgent.toLowerCase();
-  /*
-  // Only 1 row of stars
-  if(ua.match(/android/)) {
-    Game.setBoard(0,new Starfield(50,0.6,100,true));
-  } else {
-
-    Game.setBoard(0,new Starfield(20,0.4,100,true));
-    Game.setBoard(1,new Starfield(50,0.6,100));
-    Game.setBoard(2,new Starfield(100,1.0,50));
-
-  }
-  */
-  Game.setBoard(0, new Background());
-  Game.setBoard(1,new TitleScreen("Tapper",
-                                  "Press espace to start playing",
-                                  playGame));
-};
-
 var level1 = [
  // Start,   End, Gap,  Type,   Override
   [ 0,      4000,  500, 'step' ],
@@ -65,7 +41,14 @@ var level1 = [
   [ 22000,  25000, 400, 'wiggle', { x: 100 }]
 ];
 
+var startGame = function() {
+  var ua = navigator.userAgent.toLowerCase();
 
+  Game.setBoard(0, new Background());
+  Game.setBoard(1,new TitleScreen("Tapper",
+                                  "Press espace to start playing",
+                                  playGame));
+};
 
 var playGame = function() {
   var board = new GameBoard();
@@ -73,17 +56,17 @@ var playGame = function() {
   Game.setBoard(1, board);
   Game.setBoard(4, new SemiBackground());
   Game.setBoard(0, new Background());
-  Game.setBoard(5,new GamePoints(0));
+  Game.setBoard(5, new GamePoints(0));
 };
 
 var winGame = function() {
-  Game.setBoard(3,new TitleScreen("You win!",
+  Game.setBoard(3, new TitleScreen("You win!",
                                   "Press fire to play again",
                                   playGame));
 };
 
 var loseGame = function() {
-  Game.setBoard(3,new TitleScreen("You lose!",
+  Game.setBoard(3, new TitleScreen("You lose!",
                                   "Press fire to play again",
                                   playGame));
 };
@@ -149,155 +132,13 @@ var Starfield = function(speed,opacity,numStars,clear) {
   };
 };
 
-var Player = function() {
-  this.setup('Player', { vx: 0, reloadTime: 0.25, maxVel: 200 });
-
-  this.reload = this.reloadTime;
-  this.x = posiciones.abajo.x;
-  this.y = posiciones.abajo.y;
-  this.cadencia = this.reloadTime;
-
-  this.step = function(dt) {
-    var posicionSiguiente = {x: this.x, y: this.y};
-    this.cadencia -= dt;
-    if(Game.keys['up'] && this.cadencia < 0){
-      Game.keys['up'] = false;
-      if(this.x === posiciones.arriba.x){
-        posicionSiguiente = posiciones.abajo;
-      }else if(this.x === posiciones.medioArriba.x){
-        posicionSiguiente = posiciones.arriba;
-      }else if(this.x === posiciones.medioAbajo.x){
-        posicionSiguiente = posiciones.medioArriba;
-      }else if(this.x === posiciones.abajo.x){
-        posicionSiguiente = posiciones.medioAbajo;
-      }
-      this.cadencia = this.reloadTime;
-    }else if(Game.keys['down'] && this.cadencia < 0){
-      Game.keys['down'] = false;
-      if(this.x === posiciones.arriba.x){
-        posicionSiguiente = posiciones.medioArriba;
-      }else if(this.x === posiciones.medioArriba.x){
-        posicionSiguiente = posiciones.medioAbajo;
-      }else if(this.x === posiciones.medioAbajo.x){
-        posicionSiguiente = posiciones.abajo;
-      }else if(this.x === posiciones.abajo.x){
-        posicionSiguiente = posiciones.arriba;
-      }
-      this.cadencia = this.reloadTime;
-    }
-
-    this.x = posicionSiguiente.x;
-    this.y = posicionSiguiente.y;
-    this.reload-=dt;
-    if(Game.keys['fire'] && this.reload < 0) {
-      Game.keys['fire'] = false;
-      this.reload = this.reloadTime;
-
-      this.board.add(new ThrowBeer(this.x,this.y+this.h/2));
-    }
-  };
-
-};
-
-Player.prototype = new Sprite();
-Player.prototype.type = OBJECT_PLAYER;
-
-Player.prototype.hit = function(damage) {
-  if(this.board.remove(this)) {
-    loseGame();
-  }
-};
-
-
-var ThrowBeer = function(x,y) {
-  this.setup('Beer',{ vx: -70, damage: 10 });
-  this.x = x - this.w/2;
-  this.y = y - this.h;
-};
-
-ThrowBeer.prototype = new Sprite();
-ThrowBeer.prototype.type = OBJECT_PLAYER_PROJECTILE;
-
-ThrowBeer.prototype.step = function(dt){
-  this.x += this.vx * dt;
-  var collision = this.board.collide(this,OBJECT_ENEMY);
-  if(collision) {
-    collision.hit(this.damage);
-    this.board.remove(this);
-  } else if(this.x < -this.w) {
-      this.board.remove(this);
-  }
-};
-
-
-var Enemy = function(blueprint,override) {
-  this.merge(this.baseParameters);
-  this.setup(blueprint.sprite,blueprint);
-  this.merge(override);
-};
-
-Enemy.prototype = new Sprite();
-Enemy.prototype.type = OBJECT_ENEMY;
-
-Enemy.prototype.baseParameters = { A: 0, B: 0, C: 0, D: 0,
-                                   E: 0, F: 0, G: 0, H: 0,
-                                   t: 0, reloadTime: 0.75,
-                                   reload: 0 };
-
-Enemy.prototype.step = function(dt) {
-  this.t += dt;
-
-  this.vx = this.A + this.B * Math.sin(this.C * this.t + this.D);
-  this.vy = this.E + this.F * Math.sin(this.G * this.t + this.H);
-
-  this.x += this.vx * dt;
-  this.y += this.vy * dt;
-
-  var collision = this.board.collide(this,OBJECT_PLAYER);
-  if(collision) {
-    collision.hit(this.damage);
-    this.board.remove(this);
-  }
-
-  if(Math.random() < 0.01 && this.reload <= 0) {
-    this.reload = this.reloadTime;
-    if(this.missiles == 2) {
-      this.board.add(new EnemyMissile(this.x+this.w-2,this.y+this.h));
-      this.board.add(new EnemyMissile(this.x+2,this.y+this.h));
-    } else {
-      this.board.add(new EnemyMissile(this.x+this.w/2,this.y+this.h));
-    }
-
-  }
-  this.reload-=dt;
-
-  if(this.y > Game.height ||
-     this.x < -this.w ||
-     this.x > Game.width) {
-       this.board.remove(this);
-  }
-};
-
-Enemy.prototype.hit = function(damage) {
-  this.health -= damage;
-  if(this.health <=0) {
-    if(this.board.remove(this)) {
-      Game.points += this.points || 100;
-      this.board.add(new Explosion(this.x + this.w/2,
-                                   this.y + this.h/2));
-    }
-  }
-};
-
 var EnemyMissile = function(x,y) {
   this.setup('enemy_missile',{ vy: 200, damage: 10 });
   this.x = x - this.w/2;
   this.y = y;
 };
-
 EnemyMissile.prototype = new Sprite();
 EnemyMissile.prototype.type = OBJECT_ENEMY_PROJECTILE;
-
 EnemyMissile.prototype.step = function(dt)  {
   this.y += this.vy * dt;
   var collision = this.board.collide(this,OBJECT_PLAYER)
@@ -314,9 +155,7 @@ var Explosion = function(centerX,centerY) {
   this.x = centerX - this.w/2;
   this.y = centerY - this.h/2;
 };
-
 Explosion.prototype = new Sprite();
-
 Explosion.prototype.step = function(dt) {
   this.frame++;
   if(this.frame >= 12) {
@@ -336,7 +175,6 @@ var Background = function(){
   this.step = function(){};
 
 };
-
 Background.prototype = new Sprite();
 
 var SemiBackground = function(){
@@ -346,5 +184,4 @@ var SemiBackground = function(){
 
   this.step = function(){};
 };
-
 SemiBackground.prototype = new Sprite();
