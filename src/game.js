@@ -7,24 +7,12 @@ var sprites = {
   TapperGameplay: {sx: 0, sy: 480, w: 512, h: 480, frames: 1}
 };
 
-var deadzones = {
-  barra0: {
-    izquierda: { x: 10, y: 10 },
-    derecha: { x: 10, y: 10 }
-  },
-  barra1: {
-    izquierda: { x: 10, y: 10 },
-    derecha: { x: 10, y: 10 }
-  },
-  barra2: {
-    izquierda: { x: 10, y: 10 },
-    derecha: { x: 10, y: 10 }
-  },
-  barra3: {
-    izquierda: { x: 10, y: 10 },
-    derecha: { x: 10, y: 10 }
-  }
-};
+var deadZones = [
+  { x: 10, y: 10 },
+  { x: 10, y: 20 },
+  { x: 10, y: 30 },
+  { x: 10, y: 40 }
+];
 
 var OBJECT_PLAYER = 1,
     OBJECT_BEER = 2,
@@ -52,10 +40,11 @@ var playGame = function() {
   var board = new GameBoard();
   board.add(new Player());
   board.add(new Client(0, posiciones.barra3.y-10));
-  //creacionDeadZones(board);
+
   Game.setBoard(1, board);
   Game.setBoard(4, new SemiBackground());
   Game.setBoard(5, new GamePoints(0));
+  //makeDeadZones(board, deadZones);
 };
 
 var winGame = function() {
@@ -167,8 +156,8 @@ var SemiBackground = function(){
 };
 SemiBackground.prototype = new Sprite();
 
-function creacionDeadZone(boards){
-  for(i = 0; i < 8; ++i){
-
-  }
+var makeDeadZones = function(board, deadZones){
+  deadZones.forEach(function(deadZone) {
+    board.add(new DeadZone(deadZone.x, deadZone.y));
+  })
 }

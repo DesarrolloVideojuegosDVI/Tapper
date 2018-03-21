@@ -6,7 +6,6 @@ var Spawner = function(SpawnerData,callback) {
   this.t = 0;
   this.callback = callback;
 };
-
 Spawner.prototype.step = function(dt) {
   var idx = 0, remove = [], curShip = null;
 
@@ -46,5 +45,4 @@ Spawner.prototype.step = function(dt) {
   }
 
 };
-
 Spawner.prototype.draw = function(ctx) { };
