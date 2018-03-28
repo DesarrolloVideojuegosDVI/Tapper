@@ -4,14 +4,19 @@ var sprites = {
   NPC: {sx: 512, sy: 66, w: 33, h: 33, frames: 1},
   ParedIzda: {sx: 0, sy: 0, w: 512, h: 480, frames: 1},
   Player: {sx: 512, sy: 0, w: 56, h: 66, frames: 1},
-  TapperGameplay: {sx: 0, sy: 480, w: 512, h: 480, frames: 1}
+  TapperGameplay: {sx: 0, sy: 480, w: 512, h: 480, frames: 1},
+  DeadZone:{w: 23, h:32}
 };
 
 var deadZones = [
-  { x: 10, y: 10 },
-  { x: 10, y: 20 },
-  { x: 10, y: 30 },
-  { x: 10, y: 40 }
+  { x: 68, y: 90 },
+  { x: 30, y: 185 },
+  { x: 3, y: 281 },
+  { x: -30, y: 377 },
+  { x: 325, y: 90 },
+  { x: 357, y: 185 },
+  { x: 389, y: 281 },
+  { x: 421, y: 377 }
 ];
 
 var OBJECT_PLAYER = 1,
@@ -27,6 +32,72 @@ var posiciones = {
   barra3: {x: 421, y: 377}
 };
 
+//FRECUENCIA Y RETARDO ESTAN EN SEGUNDOS!!
+var spawners = [
+  { barra: posiciones.barra0, numCLientes: 1, frecuencia: 1, retardo: 0},
+  { barra: posiciones.barra1, numCLientes: 0, frecuencia: 1, retardo: 5},
+  { barra: posiciones.barra2, numCLientes: 0, frecuencia: 1, retardo: 7},
+  { barra: posiciones.barra3, numCLientes: 1, frecuencia: 1, retardo: 10}
+]
+
+var GameManager = new function(){
+  this.estado = 0; //Indica si el juego esta corriendo (0), si se ha perdido (1) o si se ha ganado (2)
+  this.numClientesTotales = 0;
+  this.numClientesEsperando = 0;
+  this.numClientesServidos = 0;
+  this.jarrasLlenas = 0;
+  this.jarrasVacias = 0;
+
+  this.inicializar = function(numClientes){
+    this.numClientesTotales += numClientes;
+  }
+
+  this.actualiza = function(tipo, operacion){
+    var num = 0;
+    if(operacion === "+")
+      num = 1;
+    else if(operacion === "-")
+      num = -1;
+    switch(tipo){
+      case "numClientesEsperando":
+        this.numClientesEsperando += num;
+        break;
+      case "numClientesServidos":
+        this.numClientesServidos += num;
+        break;
+      case "jarrasLlenas":
+        this.jarrasLlenas += num;
+        break;
+      case "jarrasVacias":
+        this.jarrasVacias += num;
+        break;
+
+      default:
+        break;
+    }
+  };
+
+  this.step = function(){
+    if(this.numClientesTotales > 1 && this.numClientesServidos === this.numClientesTotales
+      && this.numClientesEsperando <= 0 && this.jarrasLlenas <= 0 && this.jarrasVacias <= 0){
+      this.estado = 2;
+    }
+      switch(this.estado){
+        case 1:
+          loseGame();
+          break;
+        case 2:
+          winGame();
+          break;
+      }
+      console.log(this.estado);
+      console.log(this.numClientesTotales+", "+this.numClientesEsperando+", "+this.numClientesServidos);
+      console.log(this.jarrasLlenas+", "+this.jarrasVacias);
+  }
+
+  this.draw = function(){};
+};
+
 var startGame = function() {
   var ua = navigator.userAgent.toLowerCase();
 
@@ -39,12 +110,12 @@ var startGame = function() {
 var playGame = function() {
   var board = new GameBoard();
   board.add(new Player());
-  board.add(new Client(0, posiciones.barra3.y-10));
-
+  //board.add(new Client(0, posiciones.barra3.y-10));
+  makeSpawners(board, spawners);
   Game.setBoard(1, board);
   Game.setBoard(4, new SemiBackground());
   Game.setBoard(5, new GamePoints(0));
-  //makeDeadZones(board, deadZones);
+  makeDeadZones(board, deadZones);
 };
 
 var winGame = function() {
@@ -159,5 +230,11 @@ SemiBackground.prototype = new Sprite();
 var makeDeadZones = function(board, deadZones){
   deadZones.forEach(function(deadZone) {
     board.add(new DeadZone(deadZone.x, deadZone.y));
-  })
+  });
+}
+
+var makeSpawners = function(board, spawners){
+  spawners.forEach(function(spawner) {
+    board.add(new Spawner(spawner.barra, spawner.numCLientes, spawner.frecuencia, spawner.retardo));
+  });
 }

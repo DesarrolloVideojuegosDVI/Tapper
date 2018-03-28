@@ -90,6 +90,7 @@ var Game = new function() {
       }
     }
     lastTime = curTime;
+    GameManager.step();
   };
 
   // Change an active game board

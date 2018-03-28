@@ -41,7 +41,7 @@ var Player = function() {
     if(Game.keys['fire'] && this.reload < 0) {
       Game.keys['fire'] = false;
       this.reload = this.reloadTime;
-
+      GameManager.actualiza("jarrasLlenas", "+");
       this.board.add(new Beer(this.x,this.y+this.h/2));
     }
   };

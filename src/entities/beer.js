@@ -10,6 +10,6 @@ Beer.prototype.step = function(dt){
   var collision = this.board.collide(this,OBJECT_DEADZONE);
   if(collision) {
     this.board.remove(this);
-    loseGame();
+    GameManager.estado = 1; //Se ha perdido el juego.
   }
 };
