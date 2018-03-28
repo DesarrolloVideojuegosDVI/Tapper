@@ -90,9 +90,6 @@ var GameManager = new function(){
           winGame();
           break;
       }
-      console.log(this.estado);
-      console.log(this.numClientesTotales+", "+this.numClientesEsperando+", "+this.numClientesServidos);
-      console.log(this.jarrasLlenas+", "+this.jarrasVacias);
   }
 
   this.draw = function(){};
@@ -110,7 +107,6 @@ var startGame = function() {
 var playGame = function() {
   var board = new GameBoard();
   board.add(new Player());
-  //board.add(new Client(0, posiciones.barra3.y-10));
   makeSpawners(board, spawners);
   Game.setBoard(1, board);
   Game.setBoard(4, new SemiBackground());
@@ -119,15 +115,19 @@ var playGame = function() {
 };
 
 var winGame = function() {
-  Game.setBoard(3, new TitleScreen("You win!",
-                                  "Press fire to play again",
-                                  playGame));
+  var ua = navigator.userAgent.toLowerCase();
+  Game.setBoard(0, new Background());
+  Game.setBoard(1, new TitleScreen("You win!",
+                                  "Press space to play again",
+                                  this.playGame));
 };
 
 var loseGame = function() {
-  Game.setBoard(3, new TitleScreen("You lose!",
-                                  "Press fire to play again",
-                                  playGame));
+  var ua = navigator.userAgent.toLowerCase();
+  Game.setBoard(0, new Background());
+  Game.setBoard(1, new TitleScreen("You lose!",
+                                  "Press space to play again",
+                                  this.playGame));
 };
 
 var Starfield = function(speed,opacity,numStars,clear) {
@@ -189,19 +189,6 @@ var Starfield = function(speed,opacity,numStars,clear) {
     offset += dt * speed;
     offset = offset % stars.height;
   };
-};
-
-var Explosion = function(centerX,centerY) {
-  this.setup('explosion', { frame: 0 });
-  this.x = centerX - this.w/2;
-  this.y = centerY - this.h/2;
-};
-Explosion.prototype = new Sprite();
-Explosion.prototype.step = function(dt) {
-  this.frame++;
-  if(this.frame >= 12) {
-    this.board.remove(this);
-  }
 };
 
 window.addEventListener("load", function() {
