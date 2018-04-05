@@ -93,6 +93,15 @@ var GameManager = new function(){
   }
 
   this.draw = function(){};
+
+  this.reset = function() {
+    this.estado = 0;
+    this.numClientesTotales = 0;
+    this.numClientesEsperando = 0;
+    this.numClientesServidos = 0;
+    this.jarrasLlenas = 0;
+    this.jarrasVacias = 0;
+  };
 };
 
 var startGame = function() {
@@ -116,6 +125,8 @@ var playGame = function() {
 
 var winGame = function() {
   var ua = navigator.userAgent.toLowerCase();
+
+  GameManager.reset();
   Game.setBoard(0, new Background());
   Game.setBoard(1, new TitleScreen("You win!",
                                   "Press space to play again",
@@ -124,6 +135,8 @@ var winGame = function() {
 
 var loseGame = function() {
   var ua = navigator.userAgent.toLowerCase();
+
+  GameManager.reset();
   Game.setBoard(0, new Background());
   Game.setBoard(1, new TitleScreen("You lose!",
                                   "Press space to play again",
